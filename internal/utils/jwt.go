@@ -48,6 +48,22 @@ func (m *JWKSHandler) Generate(username string) (string, error) {
 	return token.SignedString(m.privateKey)
 }
 
+func (j *JWKSHandler) Verify(tokenString string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return j.privateKey.Public(), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(*Claims)
+	if !ok {
+		return nil, err
+	}
+
+	return claims, nil
+}
+
 func (j *JWKSHandler) Validate() map[string]interface{} {
 	publicKey := j.privateKey.Public().(*rsa.PublicKey)
 
