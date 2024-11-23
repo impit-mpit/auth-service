@@ -21,9 +21,21 @@ spec:
             secretKeyRef:
               name: jwt-secret
               key: private-key
+        - name: ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: auth-secrets
+              key: admin_user
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-secrets
+              key: admin_password
         ports:
         - containerPort: 8080
           name: http
+        - containerPort: 3001
+          name: grpc
         resources:
           requests:
             cpu: "100m"
@@ -43,3 +55,16 @@ spec:
   - port: 8080
     targetPort: 8080
     name: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-grpc
+spec:
+  selector:
+    app: auth-service
+  ports:
+  - port: 3001
+    targetPort: 3001
+    name: grpc
