@@ -39,7 +39,7 @@ func (m *JWKSHandler) Generate(username string) (string, error) {
 		},
 		Username: username,
 		Roles:    []string{"admin"},
-		Audience: []string{"api-gateway"},
+		Audience: []string{"grpc-gateway"},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
