@@ -14,6 +14,7 @@ type Claims struct {
 	Email    string   `json:"email"`
 	Name     string   `json:"name"`
 	Issuer   string   `json:"iss"`
+	Roles    []string `json:"roles"`
 	Subject  string   `json:"sub"`
 	Audience []string `json:"aud"`
 }
@@ -39,6 +40,7 @@ func (m *JWKSHandler) Generate(userID, email, name string) (string, error) {
 		},
 		Email: email,
 		Name:  name,
+		Roles: []string{"user"},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
