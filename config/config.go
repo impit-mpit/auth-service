@@ -5,7 +5,7 @@ import (
 )
 
 type Config struct {
-	AuthService string `env:"AUTH_SERVICE" env-default:"localhost:50051"`
+	JWTPrivateKey string `env:"JWT_PRIVATE_KEY" env-required:"true"` // RSA Private Key in PEM format
 }
 
 func NewLoadConfig() (Config, error) {

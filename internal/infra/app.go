@@ -1,9 +1,10 @@
 package infra
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
-	"log"
+	"crypto/x509"
+	"encoding/pem"
+	"fmt"
 	"neuro-most/auth-service/config"
 	"neuro-most/auth-service/internal/infra/router"
 	"neuro-most/auth-service/internal/utils"
@@ -22,10 +23,24 @@ func NewConfig(cfg config.Config) *app {
 	}
 }
 
-func (a *app) JWT() *app {
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+func parsePrivateKey(pemString string) (*rsa.PrivateKey, error) {
+	block, _ := pem.Decode([]byte(pemString))
+	if block == nil {
+		return nil, fmt.Errorf("failed to parse PEM block containing private key")
+	}
+
+	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
+	}
+
+	return privateKey, nil
+}
+
+func (a *app) JWT() *app {
+	privateKey, err := parsePrivateKey(a.conf.JWTPrivateKey)
+	if err != nil {
+		panic(err)
 	}
 	a.jwt = utils.NewJWKSHandler(privateKey)
 	return a
