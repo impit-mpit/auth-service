@@ -5,4 +5,4 @@ resources:
 - deployment.yaml
 images:
 - name: ghcr.io/impit-mpit/auth-service-master
-  newTag: 6bd4e5c
+  newTag: 784b06a
