@@ -8,13 +8,12 @@ import (
 
 type (
 	CreateTokenUseCase interface {
-		Execute(ctx context.Context, input CreateTokenUseCaseInput) CreateTokenUseCaseOutput
+		Execute(ctx context.Context, input CreateTokenUseCaseInput) (CreateTokenUseCaseOutput, error)
 	}
 
 	CreateTokenUseCaseInput struct {
-		UserID int64
-		Email  string
-		Name   string
+		Username string
+		Password string
 	}
 
 	CreateTokenUseCaseOutput struct {
@@ -22,19 +21,29 @@ type (
 	}
 
 	createTokenInteractor struct {
-		jwt utils.JWKSHandler
+		adminUser     string
+		adminPassword string
+		jwt           utils.JWKSHandler
 	}
 )
 
-func NewCreateTokenInteractor(jwt utils.JWKSHandler) CreateTokenUseCase {
+func NewCreateTokenInteractor(jwt utils.JWKSHandler, adminUser, adminPassword string) CreateTokenUseCase {
 	return &createTokenInteractor{
-		jwt: jwt,
+		jwt:           jwt,
+		adminUser:     adminUser,
+		adminPassword: adminPassword,
 	}
 }
 
-func (i *createTokenInteractor) Execute(ctx context.Context, input CreateTokenUseCaseInput) CreateTokenUseCaseOutput {
-	token, _ := i.jwt.Generate(fmt.Sprintf("%d", input.UserID), input.Email, input.Name)
+func (i *createTokenInteractor) Execute(ctx context.Context, input CreateTokenUseCaseInput) (CreateTokenUseCaseOutput, error) {
+	if input.Username != i.adminUser || input.Password != i.adminPassword {
+		return CreateTokenUseCaseOutput{}, fmt.Errorf("invalid email or password")
+	}
+	token, err := i.jwt.Generate(input.Username)
+	if err != nil {
+		return CreateTokenUseCaseOutput{}, err
+	}
 	return CreateTokenUseCaseOutput{
 		Token: token,
-	}
+	}, nil
 }

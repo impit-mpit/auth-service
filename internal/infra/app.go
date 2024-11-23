@@ -52,7 +52,7 @@ func (a *app) JWT() *app {
 }
 
 func (a *app) Router() *app {
-	a.grpc = router.NewRouterGrpc()
+	a.grpc = router.NewRouterGrpc(a.jwt, a.conf)
 	a.http = router.NewRouterHTTP(a.jwt)
 	return a
 }

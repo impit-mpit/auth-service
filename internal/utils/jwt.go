@@ -11,8 +11,7 @@ import (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	Email    string   `json:"email"`
-	Name     string   `json:"name"`
+	Username string   `json:"username"`
 	Issuer   string   `json:"iss"`
 	Roles    []string `json:"roles"`
 	Subject  string   `json:"sub"`
@@ -28,19 +27,18 @@ func NewJWKSHandler(privateKey *rsa.PrivateKey) JWKSHandler {
 	return JWKSHandler{privateKey: privateKey, issuer: "auth-service"}
 }
 
-func (m *JWKSHandler) Generate(userID, email, name string) (string, error) {
+func (m *JWKSHandler) Generate(username string) (string, error) {
 	now := time.Now()
 	claims := Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(now),
 			NotBefore: jwt.NewNumericDate(now),
-			Subject:   userID,
+			Subject:   username,
 			Issuer:    m.issuer,
 		},
-		Email: email,
-		Name:  name,
-		Roles: []string{"user"},
+		Username: username,
+		Roles:    []string{"admin"},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
