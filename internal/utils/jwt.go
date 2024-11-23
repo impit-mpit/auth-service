@@ -37,6 +37,8 @@ func (m *JWKSHandler) Generate(username string) (string, error) {
 			Subject:   username,
 			Issuer:    m.issuer,
 		},
+		Issuer:   m.issuer,
+		Subject:  username,
 		Username: username,
 		Roles:    []string{"admin"},
 		Audience: []string{"grpc-gateway"},
