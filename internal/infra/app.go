@@ -29,9 +29,14 @@ func parsePrivateKey(pemString string) (*rsa.PrivateKey, error) {
 		return nil, fmt.Errorf("failed to parse PEM block containing private key")
 	}
 
-	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		return nil, err
+	}
+	var ok bool
+	privateKey, ok := key.(*rsa.PrivateKey)
+	if !ok {
+		return nil, fmt.Errorf("not an RSA private key")
 	}
 
 	return privateKey, nil
